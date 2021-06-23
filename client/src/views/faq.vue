@@ -2,10 +2,14 @@
   <main class="faq">
     <p class="h3 text-center mt-5 text-danger">Frenquently Asked Questions</p>
 
+    <!-- loading component -->
+    <Loading v-if="remoteDataBusy"></Loading>
+
+    <!-- error message -->
     <div
       class="error alert alert-danger text-danger m-auto mt-5"
       role="alert"
-      v-if="error"
+      v-if="hasRemoteError"
     >
       <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
         <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
@@ -38,7 +42,7 @@
     </div>
 
     <section class="list mt-5">
-      <article v-for="question of questions" :key="question.title">
+      <article v-for="question of questionsList" :key="question.title">
         <p class="display-6 h3 ques">{{ question.title }}</p>
         <p class="text">{{ question.content }}</p>
       </article>
@@ -47,30 +51,11 @@
 </template>
 
 <script>
+import RemoteData from '../mixins/RemoteData.js'
 export default {
-  data() {
-    return {
-      questions: [],
-      error: null,
-    };
-  },
-  created() {
-    fetch("http://localhost:3000/questions")
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          return Promise.reject("error");
-        }
-      })
-      .then((result) => {
-        console.log("result", result);
-        this.questions = result;
-      })
-      .catch((e) => {
-        this.error = e;
-      });
-  },
+  mixins:[RemoteData({
+    questionsList:'questions'
+  })],
 };
 </script>
 
@@ -80,7 +65,7 @@ export default {
     width: 30%;
   }
   .list {
-    .ques{
+    .ques {
       color: rgb(14, 129, 150);
       font-size: 2rem;
     }
